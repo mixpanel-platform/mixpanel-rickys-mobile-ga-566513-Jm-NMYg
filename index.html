@@ -7,42 +7,48 @@
     <script src="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.js"></script>
   </head>
   <body class="mixpanel-platform-body">
+    <div class="mixpanel-platform-section">
+        <div id="eventName" style="float: left;"></div>
+        <div style="clear: left"></div>
+        <div style="clear: both;"></div>
+        <div id="graph"></div>
+    </div>
     <script>
-      // replace with event name of your choice
-      var eventName = 'Button clicked';                         
-      // use segment query on eventName, and segment the data by country
-      var $dau = MP.api.segment(eventName, 'mp_country_code', { 
-        // 'from' date should be one month ago
-        from: moment().subtract(30, 'days'),                    
-        // 'to' date should be yesterday; partial data for today impacts DAU more than it does MAU
-        to: moment().subtract(1, 'days'),                       
-        // we want the number of button clicks for each day of the month
-        unit: 'day',                                            
-         // daily counts should be unique; multiple clicks by the same person in one day should be counted only once
-        type: 'unique'                                         
-      });
- // use segment query on eventName, and segment the data by country
-      var $mau = MP.api.segment(eventName, 'mp_country_code', {
-        // 'from' date should be one month ago
-        from: moment().subtract(30, 'days'),        
-        // 'to' date should be yesterday; partial data for today
-        to: moment().subtract(1, 'days'),            
-        impacts DAU more than it does MAU
-        // we want the number of button clicks that occured over the month
-        unit: 'month',                                          
-        // multiple clicks by the same person during any point in the month should be counted only once
-        type: 'unique'                                          
-      });
+      MP.api.ready(function() {
+        // replace with event name of your choice
+        var eventName = $('#eventName').MPEventSelect();
 
-      $.when($dau, $mau).done(function(dau, mau) {
-        // average the DAU values and divide them by the MAU ones
-        // (we sum the MAU in the case where the 30 days spans over two months)
-        var dauMau = dau.avg().divide(mau.sum()).values();
-        $('<div></div>').appendTo('body').MPChart({ // create chart
-          chartType: 'bar',                         // make it a bar chart
-          data: dauMau                              // set its data
-        });
-      });
+        var runQuery = function() {
+          var $dau = MP.api.segment(eventName.val(), {
+            from: moment().subtract(30, 'days'),
+            to: moment().subtract(1, 'days'),
+            unit: 'day',
+            type: 'unique'
+          });
+
+
+          var $mau = MP.api.segment(eventName.val(), {
+            from: moment().subtract(30, 'days'),
+            to: moment().subtract(1, 'days'),
+            unit: 'month',
+            type: 'unique'
+          });
+
+          $.when($dau, $mau).done(function(dau, mau) {
+            // average the DAU values and divide them by the MAU ones
+            // (we sum the MAU in the case where the 30 days spans over two months)
+            debugger
+            var dauMau = dau.divide(mau.sum()).values();
+            console.log (dauMau)
+            $('<div></div>').appendTo('body').MPChart({ // create chart
+              chartType: 'line',
+              data: dauMau                              // set its data
+            });
+          });
+        };
+
+      eventName.on('change', runQuery);
+    });
     </script>
   </body>
 </html>
