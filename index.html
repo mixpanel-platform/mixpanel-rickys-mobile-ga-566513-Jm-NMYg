@@ -16,7 +16,7 @@
     <script>
       MP.api.ready(function() {
         // replace with event name of your choice
-        var eventName = $('#eventName').MPEventSelect();
+        var eventName = "Account Created";
 
         var runQuery = function() {
           var $dau = MP.api.segment(eventName.val(), {
