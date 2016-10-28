@@ -22,9 +22,8 @@
           var $dau = MP.api.segment(eventName.val(), {
             from: moment().subtract(30, 'days'),
             to: moment().subtract(1, 'days'),
-            unit: 'week',
-            type: 'unique',
-            where: 'properties["gt_Subscriber"] == true and (properties["gt_OS"] == "iOS")'
+            unit: 'day',
+            type: 'unique'
           });
 
 
@@ -34,7 +33,6 @@
             unit: 'month',
             type: 'unique'
           });
-          
 
           $.when($dau, $mau).done(function(dau, mau) {
             // average the DAU values and divide them by the MAU ones
